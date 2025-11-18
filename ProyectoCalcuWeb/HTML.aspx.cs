@@ -17,7 +17,7 @@ namespace ProyectoCalcuWeb
             }
         }
 
-        // Métodos de números (mantener igual)
+        // MÉTODOS PARA NÚMEROS (se mantienen igual)
         protected void b0_Click(object sender, EventArgs e)
         {
             if (lresultado.Text == "0") lresultado.Text = "";
@@ -78,39 +78,22 @@ namespace ProyectoCalcuWeb
             lresultado.Text = lresultado.Text + "9";
         }
 
-        // Botón Clear
+        // BOTÓN CLEAR
         protected void bclear_Click(object sender, EventArgs e)
         {
             lresultado.Text = "0";
-            ResetOperaciones();
+            clsOperacion.ResetOperaciones();
         }
 
-        // Método para resetear todas las operaciones
-        private void ResetOperaciones()
-        {
-            clsOperacion.sumar = false;
-            clsOperacion.restar = false;
-            clsOperacion.multiplicar = false;
-            clsOperacion.dividir = false;
-            clsOperacion.factorial = false;
-            clsOperacion.exponente2 = false;
-            clsOperacion.exponente3 = false;
-            clsOperacion.raizCuadrada = false;
-            clsOperacion.fibonacci = false;
-        }
-
-        // OPERACIONES BINARIAS - VERSIÓN ORIGINAL CORREGIDA
+        // OPERACIONES BINARIAS - Versión simplificada usando la clase
         protected void bsuma_Click(object sender, EventArgs e)
         {
-            // Guardar el primer número
             if (float.TryParse(lresultado.Text, out float valor1))
             {
                 clsOperacion.valor1 = valor1;
+                clsOperacion.ResetOperaciones();
                 clsOperacion.sumar = true;
-                clsOperacion.restar = false;
-                clsOperacion.multiplicar = false;
-                clsOperacion.dividir = false;
-                lresultado.Text = "0"; // Limpiar para el segundo número
+                lresultado.Text = "0";
             }
         }
 
@@ -119,10 +102,8 @@ namespace ProyectoCalcuWeb
             if (float.TryParse(lresultado.Text, out float valor1))
             {
                 clsOperacion.valor1 = valor1;
-                clsOperacion.sumar = false;
+                clsOperacion.ResetOperaciones();
                 clsOperacion.restar = true;
-                clsOperacion.multiplicar = false;
-                clsOperacion.dividir = false;
                 lresultado.Text = "0";
             }
         }
@@ -132,10 +113,8 @@ namespace ProyectoCalcuWeb
             if (float.TryParse(lresultado.Text, out float valor1))
             {
                 clsOperacion.valor1 = valor1;
-                clsOperacion.sumar = false;
-                clsOperacion.restar = false;
+                clsOperacion.ResetOperaciones();
                 clsOperacion.multiplicar = true;
-                clsOperacion.dividir = false;
                 lresultado.Text = "0";
             }
         }
@@ -145,15 +124,13 @@ namespace ProyectoCalcuWeb
             if (float.TryParse(lresultado.Text, out float valor1))
             {
                 clsOperacion.valor1 = valor1;
-                clsOperacion.sumar = false;
-                clsOperacion.restar = false;
-                clsOperacion.multiplicar = false;
+                clsOperacion.ResetOperaciones();
                 clsOperacion.dividir = true;
                 lresultado.Text = "0";
             }
         }
 
-        // Botón de resultado
+        // BOTÓN DE RESULTADO - Ahora usa el método unificado de la clase
         protected void bresultado_Click(object sender, EventArgs e)
         {
             try
@@ -161,37 +138,19 @@ namespace ProyectoCalcuWeb
                 if (float.TryParse(lresultado.Text, out float valor2))
                 {
                     clsOperacion.valor2 = valor2;
-                    float resultado = 0;
-
-                    if (clsOperacion.sumar)
-                    {
-                        resultado = clsOperacion.metodo_sumar(clsOperacion.valor1, clsOperacion.valor2);
-                    }
-                    else if (clsOperacion.restar)
-                    {
-                        resultado = clsOperacion.metodo_restar(clsOperacion.valor1, clsOperacion.valor2);
-                    }
-                    else if (clsOperacion.multiplicar)
-                    {
-                        resultado = clsOperacion.metodo_multiplicar(clsOperacion.valor1, clsOperacion.valor2);
-                    }
-                    else if (clsOperacion.dividir)
-                    {
-                        resultado = clsOperacion.metodo_dividir(clsOperacion.valor1, clsOperacion.valor2);
-                    }
-
+                    float resultado = clsOperacion.EjecutarOperacionBinaria();
                     lresultado.Text = resultado.ToString();
-                    ResetOperaciones();
+                    clsOperacion.ResetOperaciones();
                 }
             }
             catch (Exception ex)
             {
                 lresultado.Text = $"Error: {ex.Message}";
-                ResetOperaciones();
+                clsOperacion.ResetOperaciones();
             }
         }
 
-        // Botón decimal
+        // BOTÓN DECIMAL
         protected void bdecimal_Click(object sender, EventArgs e)
         {
             if (lresultado.Text == "0")
@@ -204,49 +163,15 @@ namespace ProyectoCalcuWeb
             }
         }
 
-        // OPERACIONES UNITARIAS - cálculo inmediato
-        protected void Button1_Click(object sender, EventArgs e)
-        {
-            CalcularFactorialDirecto();
-        }
-
-        private void CalcularFactorialDirecto()
+        // OPERACIONES UNITARIAS - Todas llaman a los métodos de la clase
+        protected void Button1_Click(object sender, EventArgs e) // Factorial
         {
             try
             {
-                string textoActual = lresultado.Text;
-
-                if (string.IsNullOrEmpty(textoActual) || textoActual == "0")
+                if (float.TryParse(lresultado.Text, out float valor))
                 {
-                    lresultado.Text = "1";
-                    return;
-                }
-
-                if (int.TryParse(textoActual, out int numero))
-                {
-                    if (numero < 0)
-                    {
-                        lresultado.Text = "Error: No negativo";
-                        return;
-                    }
-
-                    if (numero > 20)
-                    {
-                        lresultado.Text = "Error: Máx 20";
-                        return;
-                    }
-
-                    long resultado = 1;
-                    for (int i = 2; i <= numero; i++)
-                    {
-                        resultado *= i;
-                    }
-
+                    long resultado = clsOperacion.metodo_factorial(valor);
                     lresultado.Text = resultado.ToString();
-                }
-                else
-                {
-                    lresultado.Text = "Error: Número inválido";
                 }
             }
             catch (Exception ex)
@@ -277,9 +202,9 @@ namespace ProyectoCalcuWeb
         {
             try
             {
-                if (float.TryParse(lresultado.Text, out float numero))
+                if (float.TryParse(lresultado.Text, out float valor))
                 {
-                    float resultado = clsOperacion.metodo_raizCuadrada(numero);
+                    float resultado = clsOperacion.metodo_raizCuadrada(valor);
                     lresultado.Text = resultado.ToString("F6").TrimEnd('0').TrimEnd('.');
                 }
             }
@@ -289,38 +214,14 @@ namespace ProyectoCalcuWeb
             }
         }
 
-        protected void Button2_Click(object sender, EventArgs e)
+        protected void Button2_Click(object sender, EventArgs e) // Fibonacci
         {
             try
             {
-                string textoActual = lresultado.Text;
-
-                if (string.IsNullOrEmpty(textoActual))
+                if (float.TryParse(lresultado.Text, out float valor))
                 {
-                    lresultado.Text = "0";
-                    return;
-                }
-
-                if (int.TryParse(textoActual, out int numero))
-                {
-                    if (numero < 0)
-                    {
-                        lresultado.Text = "Error: No negativo";
-                        return;
-                    }
-
-                    if (numero > 50)
-                    {
-                        lresultado.Text = "Error: Máx 50";
-                        return;
-                    }
-
-                    long resultado = clsOperacion.metodo_fibonacci(numero);
+                    long resultado = clsOperacion.metodo_fibonacci(valor);
                     lresultado.Text = resultado.ToString();
-                }
-                else
-                {
-                    lresultado.Text = "Error: Número inválido";
                 }
             }
             catch (Exception ex)
